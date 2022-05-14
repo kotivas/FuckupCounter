@@ -48,6 +48,9 @@
      <height>291</height>
     </rect>
    </property>
+   <property name="styleSheet">
+    <string notr="true">font: 16pt;</string>
+   </property>
   </widget>
  </widget>
  <resources/>

@@ -5,7 +5,6 @@
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import QDate
 from sys import argv
-import time
 
 class Ui(QtWidgets.QMainWindow): # класс ебать основного окна
     def __init__(self): # Инициализация окна
@@ -29,8 +28,8 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
     def closeEvent(self, event):
         self.UpdateFuckaps(write=True)
 
-
     def openHistory(self):
+
         self.hstry = History()
         self.hstry.show()
 
@@ -96,11 +95,22 @@ class History(QtWidgets.QWidget): # класс окна истории ебат�
         self.historyList = self.findChild(QtWidgets.QListWidget, 'listWidget') # отображение истории факапов ебать
         self.historyList.itemClicked.connect(self.openEdit)
 
-        self.show()
+        self.getHistory() # получение и запись истории факапов 
 
     def openEdit(self):
         self.d = Edit()
         self.d.show()
+
+    def getHistory(self):
+        f = open("all.txt", "r")
+        readed = f.readlines()
+
+        for i in range(1, len(readed)):
+            tmp = readed[i].split(";")
+
+            self.historyList.addItem("{0} - {1} раз(а)".format(tmp[0], tmp[1]))
+        f.close()
+
 
 class Edit(QtWidgets.QWidget):
     def __init__(self):
