@@ -98,6 +98,14 @@ class History(QtWidgets.QWidget): # класс окна истории ебат�
         self.getHistory() # получение и запись истории факапов 
 
     def openEdit(self):
+        global date
+        
+        item = self.historyList.currentItem().text()
+
+        date = item[0] + item[1] + item[2] + item[3]
+
+        print(date)
+
         self.d = Edit()
         self.d.show()
 
@@ -118,13 +126,44 @@ class Edit(QtWidgets.QWidget):
         uic.loadUi('edit.ui', self)
 
         self.ImTooLazyToMakeaName = self.findChild(QtWidgets.QListWidget, 'listWidget') # отображение факапов за день ебать
+        self.ImTooLazyToMakeaName.itemClicked.connect(self.openfEdit)
 
-        self.day = self.findChild(QtWidgets.QListWidget, 'listWidget') # отображение дня ебать
+        self.day = self.findChild(QtWidgets.QLabel, 'label') # отображение дня ебать
+
+        self.getFuckup()
+
+    def openfEdit(self):
+
+        self.d = fEdit()
+        self.d.show()
+
+    def getFuckup(self):
+        global date
+
+        f = open("all.txt", "r")
+        readed = f.readlines()
+        
+        self.day.setText("{0}:".format(date))
+
+        for i in range(1, len(readed)):
+            tmp = readed[i].split(";")
+            if tmp[0] == date:
+                for i in range(0, int(tmp[1])):
+                    #print(tmp[1])
+                    self.ImTooLazyToMakeaName.addItem("{0} - нет".format(i+1))
+
+class fEdit(QtWidgets.QWidget):
+    def __init__(self):
+        super(fEdit, self).__init__()
+        uic.loadUi('fEdit.ui', self)
+
+        self.data = self.findChild(QtWidgets.QLabel, 'label')
+
+        self.editline = self.findChild(QtWidgets.QTextEdit, 'textEdit')
 
 if __name__ == "__main__": # ну эт крч что бы работало
 
-    counter = 0
-
+    counter =0
 
     app = QtWidgets.QApplication(argv)
     window = Ui()
