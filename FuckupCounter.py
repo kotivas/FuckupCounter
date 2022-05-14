@@ -149,8 +149,7 @@ class Edit(QtWidgets.QWidget):
             tmp = readed[i].split(";")
             if tmp[0] == date:
                 for i in range(0, int(tmp[1])):
-                    #print(tmp[1])
-                    self.ImTooLazyToMakeaName.addItem("{0} - нет".format(i+1))
+                    self.ImTooLazyToMakeaName.addItem(tmp[2].split(":")[i])
 
 class fEdit(QtWidgets.QWidget):
     def __init__(self):
