@@ -1,4 +1,5 @@
-#by kotivas
+#code by kotivas
+#idea by VaneZ#2039 
 #PyQt6
 
 from PyQt6 import QtWidgets, uic
@@ -11,7 +12,7 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
         super(Ui, self).__init__()
         uic.loadUi('main.ui', self)
 
-        self.stupid = self.findChild(QtWidgets.QPushButton, 'pushButton') # ванез тупой ебать
+        self.stupid = self.findChild(QtWidgets.QPushButton, 'pushButton') # ванез лох ебать
         self.stupid.clicked.connect(self.ImStupid)
 
         self.showHistory = self.findChild(QtWidgets.QPushButton, 'pushButton_2') # кнопка показать историю ебать
@@ -26,32 +27,61 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
         self.show() 
     
     def closeEvent(self, event):
+
+        #f = open("all.txt", "w")
         self.UpdateFuckaps(write=True)
-        print("writed")
+
 
     def openHistory(self):
         self.hstry = History()
         self.hstry.show()
 
     def UpdateFuckaps(self, write):
-        global counter
+        global counter, readed
+        
+        total  = 0
 
-        f = open("all.txt", "r+") # открытие файла
+        try:
+            f = open("all.txt", "r+") # открытие файла
+        except FileNotFoundError:
+            f = open("all.txt", "w+")
+            f.write("0.0;0;\n")
+
         readed = f.readlines()
+        f.close()
+        
+        for i in range(0, len(readed)): # счёт всех факапов
+            tmp = readed[i].split(";")
+            total += int(tmp[1])
 
-        total = len(readed) + counter #факапов всего
+        total += counter 
+
         currentTime = str(QDate.currentDate().day()) + "." + str(QDate.currentDate().month())# текущее время
 
-        if write:
-            f.write("{0} - {1} раз(-а)\n".format(currentTime, counter))
+        if write: # запсиь факапов в файл
+            f = open("all.txt", "w") # открытие файла на запись
+                
+            if tmp[0] == currentTime: # если последняя строчка имеет дату которая равна текущей 
+                for i in range(0, len(readed[:-1])): # запись всех факапов, кроме последнего
+                    f.write(readed[i])
+                counter += int(tmp[1])
+ 
+            else:
+                for i in range(0, len(readed)):
+                    f.write(readed[i])
+
+
+            f.write("{0};{1};\n".format(currentTime, counter))
+
+            f.close()
 
         self.all.setText("всего: {0}".format(total))
-
-        f.close()
 
     def ImStupid(self):
         global counter
         counter += 1
+
+        self.UpdateFuckaps(write=False)
 
 class History(QtWidgets.QWidget): # класс окна истории ебать
     def __init__(self):
