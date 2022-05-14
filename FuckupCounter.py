@@ -27,8 +27,6 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
         self.show() 
     
     def closeEvent(self, event):
-
-        #f = open("all.txt", "w")
         self.UpdateFuckaps(write=True)
 
 
@@ -40,12 +38,14 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
         global counter, readed
         
         total  = 0
+        todayCounter = 0
 
         try:
             f = open("all.txt", "r+") # открытие файла
         except FileNotFoundError:
             f = open("all.txt", "w+")
-            f.write("0.0;0;\n")
+            f.write("1.1;0;\n")
+            tmp = ["1.1", "0"]
 
         readed = f.readlines()
         f.close()
@@ -55,8 +55,12 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
             total += int(tmp[1])
 
         total += counter 
-
         currentTime = str(QDate.currentDate().day()) + "." + str(QDate.currentDate().month())# текущее время
+
+        if tmp[0] == currentTime:
+            todayCounter += int(tmp[1])
+
+        todayCounter += counter
 
         if write: # запсиь факапов в файл
             f = open("all.txt", "w") # открытие файла на запись
@@ -76,6 +80,7 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
             f.close()
 
         self.all.setText("всего: {0}".format(total))
+        self.today.setText("за сегодня: {0}".format(todayCounter))
 
     def ImStupid(self):
         global counter
