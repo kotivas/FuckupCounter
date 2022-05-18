@@ -72,9 +72,15 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
             else:
                 for i in range(0, len(readed)):
                     f.write(readed[i])
+            
+            print(todayCounter)
+            print(counter)
 
-
-            f.write("{0};{1};\n".format(currentTime, counter))
+            desc = ""
+            for i in range(1, counter+1):
+                desc += "{0} - no:".format(i)
+                
+            f.write("{0};{1};{2}\n".format(currentTime, counter, desc))
 
             f.close()
 
