@@ -1,6 +1,12 @@
 #code by kotivas
-#idea by VaneZ#2039 
+#idea by VaneZ#2039 (DISCORD)
 #PyQt6
+
+#----todo-list----
+# пофиксить баг, когда старое описание факапа стирается [СДЕЛАНО]
+# пофиксить баг, когда надо перезапустить прогу, что бы обновилась история факапов
+# пофиксить баг, когда прога не работает если файл ./all.txt пустой, прога не работает [СДЕЛАНО]
+# добавить функцию изменения описания факапа через gui
 
 from PyQt6 import QtWidgets, uic
 from PyQt6.QtCore import QDate
@@ -41,18 +47,21 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
 
         try:
             f = open("all.txt", "r+") # открытие файла
-        except FileNotFoundError:
-            f = open("all.txt", "w+")
-            f.write("1.1;0;\n")
-            tmp = ["1.1", "0"]
+            readed = f.readlines() # чтение файла
 
-        readed = f.readlines()
+        except FileNotFoundError:
+            f = open("all.txt", "w") # создание файла
+            readed = []
         f.close()
-        
+
+        if readed == []: # если файл пуст
+            readed = ["0.0;0;0 - NO:\n"] # он заполняется пустышкой
+
         for i in range(0, len(readed)): # счёт всех факапов
             tmp = readed[i].split(";")
             total += int(tmp[1])
 
+        desc = tmp[2][:-1]
         total += counter 
         currentTime = str(QDate.currentDate().day()) + "." + str(QDate.currentDate().month())# текущее время
 
@@ -67,19 +76,22 @@ class Ui(QtWidgets.QMainWindow): # класс ебать основного ок
             if tmp[0] == currentTime: # если последняя строчка имеет дату которая равна текущей 
                 for i in range(0, len(readed[:-1])): # запись всех факапов, кроме последнего
                     f.write(readed[i])
+
+                if len(desc.split(":"))-1 != todayCounter: # если количество описаний факапов, не соотвествует кол-ву факапов
+                    startFrom = len(desc.split(":"))-1
+                    for i in range(startFrom, todayCounter):
+                        desc += "{0} - no:".format(i+1) # в конец добавляются недостающие факапы
+
                 counter += int(tmp[1])
- 
+            
             else:
                 for i in range(0, len(readed)):
                     f.write(readed[i])
-            
-            print(todayCounter)
-            print(counter)
-
-            desc = ""
-            for i in range(1, counter+1):
-                desc += "{0} - no:".format(i)
                 
+                desc = ""
+                for i in range(1, counter+1):
+                    desc += "{0} - no:".format(i)
+
             f.write("{0};{1};{2}\n".format(currentTime, counter, desc))
 
             f.close()
@@ -107,7 +119,7 @@ class History(QtWidgets.QWidget): # класс окна истории ебат�
         global date
         
         item = self.historyList.currentItem().text()
-
+        
         date = item[0] + item[1] + item[2] + item[3]
 
         print(date)
@@ -136,9 +148,14 @@ class Edit(QtWidgets.QWidget):
 
         self.day = self.findChild(QtWidgets.QLabel, 'label') # отображение дня ебать
 
-        self.getFuckup()
+        self.getFuckup() # получение факапов
 
-    def openfEdit(self):
+    def openfEdit(self): # открытие изменение описания факапа
+        global dateANDcount
+
+        item = self.ImTooLazyToMakeaName.currentItem().text()
+
+        dateANDcount = date + " - " + item[:-4]
 
         self.d = fEdit()
         self.d.show()
@@ -149,9 +166,9 @@ class Edit(QtWidgets.QWidget):
         f = open("all.txt", "r")
         readed = f.readlines()
         
-        self.day.setText("{0}:".format(date))
+        self.day.setText("{0}:".format(date)) # установка даты
 
-        for i in range(1, len(readed)):
+        for i in range(1, len(readed)): # добавление всех факапов текущего дня
             tmp = readed[i].split(";")
             if tmp[0] == date:
                 for i in range(0, int(tmp[1])):
@@ -161,14 +178,20 @@ class fEdit(QtWidgets.QWidget):
     def __init__(self):
         super(fEdit, self).__init__()
         uic.loadUi('fEdit.ui', self)
+        global dateANDcount
 
         self.data = self.findChild(QtWidgets.QLabel, 'label')
+        self.data.setText(dateANDcount)
 
         self.editline = self.findChild(QtWidgets.QTextEdit, 'textEdit')
 
+    def closeEvent(self, event):
+        global output
+        output = self.editline.toPlainText()
+
 if __name__ == "__main__": # ну эт крч что бы работало
 
-    counter =0
+    counter = 0
 
     app = QtWidgets.QApplication(argv)
     window = Ui()
